@@ -1,0 +1,305 @@
+/*
+ * Tailwind v4 entry. Keep every @import at the top. Web fonts are loaded with a <link>
+ * in src/app/layout.tsx and named in the --font-* tokens below.
+ */
+@import "tailwindcss" source(none);
+@source "../src";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+/* Phones with a short visible area (iPhone SE, Safari with toolbars): tighten spacing. */
+@custom-variant short (@media (max-height: 740px));
+
+/*
+ * Personal Control design system
+ * Evergreen + mint identity (inherited from the original Personal Control file),
+ * warm sage-white surfaces, Sora for display, Manrope for text.
+ */
+
+@theme inline {
+  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: "Sora", ui-sans-serif, system-ui, -apple-system, sans-serif;
+
+  --radius-sm: calc(var(--radius) - 6px);
+  --radius-md: calc(var(--radius) - 4px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --radius-2xl: calc(var(--radius) + 8px);
+  --radius-3xl: calc(var(--radius) + 12px);
+  --radius-4xl: calc(var(--radius) + 16px);
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-ring-offset-background: var(--background);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --color-deep: var(--deep);
+  --color-deep-foreground: var(--deep-foreground);
+  --color-deep-muted: var(--deep-muted);
+  --color-deep-raised: var(--deep-raised);
+  --color-success: var(--success);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-soft: var(--warning-soft);
+  --color-danger-soft: var(--danger-soft);
+  --color-income: var(--income);
+  --color-expense: var(--expense);
+
+  --shadow-card: var(--shadow-card-value);
+  --shadow-float: var(--shadow-float-value);
+  --shadow-auth-card: var(--shadow-auth-card-value);
+  --shadow-cta: var(--shadow-cta-value);
+
+  --color-auth-ink: var(--auth-ink);
+  /* Google sign-in button: colors fixed by Google's branding guidelines (light theme). */
+  --color-google-surface: var(--google-surface);
+  --color-google-border: var(--google-border);
+  --color-google-ink: var(--google-ink);
+}
+
+:root {
+  --radius: 1rem;
+  --background: oklch(0.972 0.008 155);
+  --foreground: oklch(0.23 0.03 178);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.23 0.03 178);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.23 0.03 178);
+  --primary: oklch(0.46 0.09 168);
+  --primary-foreground: oklch(0.985 0.01 160);
+  --secondary: oklch(0.945 0.012 160);
+  --secondary-foreground: oklch(0.3 0.03 178);
+  --muted: oklch(0.955 0.008 160);
+  --muted-foreground: oklch(0.52 0.02 200);
+  --accent: oklch(0.935 0.045 160);
+  --accent-foreground: oklch(0.37 0.08 168);
+  --destructive: oklch(0.55 0.17 25);
+  --destructive-foreground: oklch(0.985 0.01 25);
+  --border: oklch(0.915 0.01 165);
+  --input: oklch(0.89 0.012 165);
+  --ring: oklch(0.46 0.09 168);
+
+  --deep: oklch(0.27 0.045 172);
+  --deep-foreground: oklch(0.97 0.012 160);
+  --deep-muted: oklch(0.79 0.035 165);
+  --deep-raised: oklch(0.34 0.05 170);
+  --success: oklch(0.52 0.12 155);
+  --success-soft: oklch(0.945 0.04 155);
+  --warning: oklch(0.58 0.12 70);
+  --warning-soft: oklch(0.965 0.045 85);
+  --danger-soft: oklch(0.955 0.03 25);
+  --income: oklch(0.52 0.12 155);
+  --expense: oklch(0.6 0.15 32);
+
+  --chart-1: oklch(0.46 0.09 168);
+  --chart-2: oklch(0.66 0.15 35);
+  --chart-3: oklch(0.75 0.13 80);
+  --chart-4: oklch(0.78 0.08 165);
+  --chart-5: oklch(0.55 0.04 230);
+
+  --sidebar: oklch(0.27 0.045 172);
+  --sidebar-foreground: oklch(0.97 0.012 160);
+  --sidebar-primary: oklch(0.86 0.08 160);
+  --sidebar-primary-foreground: oklch(0.25 0.045 172);
+  --sidebar-accent: oklch(0.34 0.05 170);
+  --sidebar-accent-foreground: oklch(0.97 0.012 160);
+  --sidebar-border: oklch(0.36 0.04 170);
+  --sidebar-ring: oklch(0.86 0.08 160);
+
+  --shadow-card-value: 0 1px 2px oklch(0.3 0.03 175 / 0.04), 0 10px 28px -16px oklch(0.3 0.03 175 / 0.18);
+  --shadow-float-value: 0 -1px 0 oklch(0.3 0.03 175 / 0.06), 0 -12px 32px -18px oklch(0.3 0.03 175 / 0.25);
+  --gradient-deep: linear-gradient(160deg, oklch(0.31 0.055 170), oklch(0.24 0.04 182));
+  --gradient-mint: linear-gradient(135deg, oklch(0.95 0.05 160), oklch(0.9 0.07 165));
+
+  /* Sign-in screen */
+  --auth-ink: #ffffff;
+  --gradient-auth: linear-gradient(165deg, #0a2f26 0%, #123d33 100%);
+  --gradient-primary: linear-gradient(135deg, oklch(0.53 0.105 163), oklch(0.4 0.085 172));
+  --shadow-auth-card-value: 0 -18px 48px -24px oklch(0.15 0.04 175 / 0.55), 0 2px 6px oklch(0.2 0.03 175 / 0.06);
+  --shadow-cta-value: 0 10px 22px -12px oklch(0.4 0.09 170 / 0.7);
+  --google-surface: #ffffff;
+  --google-border: #747775;
+  --google-ink: #1f1f1f;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  html {
+    -webkit-text-size-adjust: 100%;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    font-feature-settings: "tnum" 0;
+    overscroll-behavior-y: none;
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+
+  /* iOS Safari zooms into inputs smaller than 16px — keep them at 16px on phones. */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
+
+  @media (min-width: 768px) {
+    input,
+    select,
+    textarea {
+      font-size: 14px;
+    }
+  }
+
+  /*
+   * Native date/time controls carry an intrinsic width of their own (iOS Safari
+   * sizes them to the formatted value + calendar glyph). Without these they can
+   * push past the right edge of a phone screen. Keep the native picker, but let
+   * the box shrink to the field width like every other control.
+   */
+  input[type="date"],
+  input[type="time"],
+  input[type="month"],
+  input[type="week"] {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  input[type="date"]::-webkit-date-and-time-value,
+  input[type="time"]::-webkit-date-and-time-value,
+  input[type="month"]::-webkit-date-and-time-value,
+  input[type="week"]::-webkit-date-and-time-value {
+    min-width: 0;
+    text-align: left;
+  }
+
+  @media print {
+    .no-print {
+      display: none !important;
+    }
+    body {
+      background: white;
+    }
+  }
+}
+
+@utility pt-safe {
+  padding-top: env(safe-area-inset-top);
+}
+
+@utility pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@utility pb-nav {
+  padding-bottom: calc(env(safe-area-inset-bottom) + 6rem);
+}
+
+@utility bg-gradient-deep {
+  background-image: var(--gradient-deep);
+}
+
+@utility bg-gradient-mint {
+  background-image: var(--gradient-mint);
+}
+
+@utility tabular {
+  font-variant-numeric: tabular-nums;
+}
+
+@utility scrollbar-none {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@utility bg-gradient-auth {
+  background-image: var(--gradient-auth);
+}
+
+@utility bg-gradient-primary {
+  background-image: var(--gradient-primary);
+}
+
+/* Faint dot grid laid over the sign-in gradient. */
+@utility bg-auth-dots {
+  background-image: radial-gradient(circle at 1px 1px, oklch(1 0 0 / 0.07) 1px, transparent 0);
+  background-size: 22px 22px;
+}
+
+@keyframes auth-rise {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes auth-fade {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@utility animate-auth-rise {
+  animation: auth-rise 560ms cubic-bezier(0.2, 0.8, 0.2, 1) 80ms both;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+@utility animate-auth-fade {
+  animation: auth-fade 480ms ease-out both;
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
