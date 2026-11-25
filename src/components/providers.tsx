@@ -1,21 +1,27 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "@/components/ui/sonner";
-import { supabase } from "@/lib/supabase-client";
+import { authClient } from "@/lib/auth-client";
+
+function SessionCache({ queryClient }: { queryClient: QueryClient }) {
+  const { data, isPending } = authClient.useSession();
+  const previous = useRef<string | undefined>(undefined);
+  useEffect(() => {
+    if (isPending) return;
+    const userId = data?.user.id;
+    if (previous.current !== userId) queryClient.clear();
+    previous.current = userId;
+  }, [data?.user.id, isPending, queryClient]);
+  return null;
+}
 
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
-  useEffect(() => {
-    const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "SIGNED_OUT") queryClient.clear();
-      else if (event === "SIGNED_IN" || event === "USER_UPDATED") void queryClient.invalidateQueries();
-    });
-    return () => data.subscription.unsubscribe();
-  }, [queryClient]);
   return (
     <QueryClientProvider client={queryClient}>
+      <SessionCache queryClient={queryClient} />
       {children}
       <Toaster position="top-center" richColors closeButton />
     </QueryClientProvider>

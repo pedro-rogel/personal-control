@@ -5,7 +5,7 @@ import { useNavigate } from "@/hooks/use-navigate";
 import { useEffect } from "react";
 import { BarChart3, CalendarCheck, HeartPulse, ShieldCheck, Users, Wallet } from "lucide-react";
 
-import { supabase } from "@/lib/supabase-client";
+import { authClient } from "@/lib/auth-client";
 import { Button } from "@/components/ui/button";
 
 
@@ -21,11 +21,10 @@ const FEATURES = [
 
 function Index() {
   const navigate = useNavigate();
+  const { data } = authClient.useSession();
   useEffect(() => {
-    void supabase.auth.getSession().then(({ data }) => {
-      if (data.session) void navigate({ to: "/painel", replace: true });
-    });
-  }, [navigate]);
+    if (data?.session) void navigate({ to: "/painel", replace: true });
+  }, [data?.session, navigate]);
 
   return (
     <div className="flex min-h-dvh flex-col bg-gradient-deep pt-safe text-deep-foreground">
@@ -41,7 +40,7 @@ function Index() {
           <h1 className="mt-6 text-4xl font-extrabold leading-[1.05]">Personal Control</h1>
           <p className="mt-3 text-base text-deep-muted">
             Sua rotina de personal trainer organizada: alunos, aulas, avaliações e financeiro,
-            salvos com segurança na nuvem.
+            salvos no seu servidor.
           </p>
           <ul className="mt-8 grid grid-cols-2 gap-2">
             {FEATURES.map(({ icon: Icon, label }) => (

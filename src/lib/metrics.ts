@@ -1,6 +1,6 @@
 /**
  * Pure business rules shared by the dashboard, finance and reports screens.
- * Kept free of React/Supabase so they can be unit-tested.
+ * Kept free of React and database access so they can be unit-tested.
  */
 
 export interface LessonLike {

@@ -15,7 +15,7 @@ export const transactions = pgTable(
     }),
     transactionDate: date("transaction_date", { mode: "string" }).notNull().defaultNow(),
     competence: text("competence"),
-    amount: numeric("amount").notNull(),
+    amount: numeric("amount", { mode: "number" }).notNull(),
     method: text("method"),
     category: text("category"),
     description: text("description"),

@@ -22,13 +22,13 @@ export const students = pgTable(
     sex: text("sex"),
     phone: text("phone"),
     email: text("email"),
-    heightCm: num("height_cm"),
-    lessonValue: num("lesson_value"),
-    packageValue: num("package_value"),
+    heightCm: num("height_cm", { mode: "number" }),
+    lessonValue: num("lesson_value", { mode: "number" }),
+    packageValue: num("package_value", { mode: "number" }),
     billing: text("billing", { enum: ["monthly", "class"] })
       .notNull()
       .default("monthly"),
-    absenceRule: text("absence_rule", { enum: ["makeup", "charge_normally", "not_charge "] })
+    absenceRule: text("absence_rule", { enum: ["makeup", "charge_normally", "not_charge"] })
       .notNull()
       .default("makeup"),
     paymentTiming: text("payment_timing", { enum: ["in_advance", "end_month", "after_lesson"] })
@@ -49,7 +49,7 @@ export const students = pgTable(
       "students_timing_chk",
       sql`${table.paymentTiming} IN ('in_advance', 'end_month', 'after_lesson')`,
     ),
-    check("students_name_len", sql`char_length(${table.name} BETWEEN 1 AND 200)`),
+    check("students_name_len", sql`char_length(${table.name}) BETWEEN 1 AND 200`),
     index("students_owner_idx").on(table.ownerId),
   ],
 );

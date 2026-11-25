@@ -1,63 +1,45 @@
 import { queryOptions, useMutation, useQueryClient, type QueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 
-import { supabase } from "@/lib/supabase-client";
-import type { Tables, TablesInsert } from "@/integrations/supabase/types";
+import type { ImportRows } from "@/lib/backup";
+import type { Assessment, Lesson, Student, TableName, TablesInsert, Transaction } from "@/lib/models";
 
-export type Student = Tables<"students">;
-export type Lesson = Tables<"lessons">;
-export type Assessment = Tables<"assessments">;
-export type Transaction = Tables<"transactions">;
+export type { Assessment, Lesson, Student, Transaction } from "@/lib/models";
 
-export type TableName = "students" | "lessons" | "assessments" | "transactions";
+async function request<T>(method: string, table: TableName, payload?: Record<string, unknown>): Promise<T> {
+  const url = method === "GET" ? `/api/records?table=${table}` : "/api/records";
+  const response = await fetch(url, {
+    method,
+    credentials: "same-origin",
+    cache: "no-store",
+    headers: payload ? { "Content-Type": "application/json" } : undefined,
+    body: payload ? JSON.stringify({ table, ...payload }) : undefined,
+  });
+  if (!response.ok) {
+    const body = await response.json().catch(() => null);
+    throw new Error(body?.error ?? `Falha na solicitação (${response.status}).`);
+  }
+  return response.status === 204 ? undefined as T : response.json() as Promise<T>;
+}
 
 export const studentsQuery = queryOptions({
   queryKey: ["students"],
-  queryFn: async (): Promise<Student[]> => {
-    const { data, error } = await supabase.from("students").select("*").order("name");
-    if (error) throw error;
-    return data;
-  },
+  queryFn: (): Promise<Student[]> => request("GET", "students"),
 });
 
 export const lessonsQuery = queryOptions({
   queryKey: ["lessons"],
-  queryFn: async (): Promise<Lesson[]> => {
-    const { data, error } = await supabase
-      .from("lessons")
-      .select("*")
-      .order("lesson_date", { ascending: false })
-      .order("start_time", { ascending: false, nullsFirst: false })
-      .limit(5000);
-    if (error) throw error;
-    return data;
-  },
+  queryFn: (): Promise<Lesson[]> => request("GET", "lessons"),
 });
 
 export const assessmentsQuery = queryOptions({
   queryKey: ["assessments"],
-  queryFn: async (): Promise<Assessment[]> => {
-    const { data, error } = await supabase
-      .from("assessments")
-      .select("*")
-      .order("assessment_date", { ascending: false })
-      .limit(5000);
-    if (error) throw error;
-    return data;
-  },
+  queryFn: (): Promise<Assessment[]> => request("GET", "assessments"),
 });
 
 export const transactionsQuery = queryOptions({
   queryKey: ["transactions"],
-  queryFn: async (): Promise<Transaction[]> => {
-    const { data, error } = await supabase
-      .from("transactions")
-      .select("*")
-      .order("tx_date", { ascending: false })
-      .limit(5000);
-    if (error) throw error;
-    return data;
-  },
+  queryFn: (): Promise<Transaction[]> => request("GET", "transactions"),
 });
 
 export const allQueryKeys = [
@@ -78,25 +60,20 @@ export function ensureAll(qc: QueryClient) {
 
 function friendlyError(e: unknown): string {
   const msg = e instanceof Error ? e.message : String(e);
-  if (/network|fetch/i.test(msg)) return "Sem conexão. Verifique a internet e tente novamente.";
-  return "Não foi possível salvar. Tente novamente.";
+  if (/network|fetch/i.test(msg)) return "Sem conexão. Verifique o servidor e tente novamente.";
+  return msg;
 }
 
-/** Insert or update a row; data is written to the cloud immediately (auto-save). */
+/** Insert or update a row immediately through the local server. */
 export function useSaveRow<T extends TableName>(table: T) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, values }: { id?: string | undefined; values: TablesInsert<T> }) => {
-      const q = supabase.from(table) as unknown as {
-        insert: (v: unknown) => PromiseLike<{ error: unknown }>;
-        update: (v: unknown) => { eq: (c: string, v: string) => PromiseLike<{ error: unknown }> };
-      };
-      const { error } = id ? await q.update(values).eq("id", id) : await q.insert(values);
-      if (error) throw error instanceof Error ? error : new Error(JSON.stringify(error));
+      await request(id ? "PATCH" : "POST", table, { ...(id && { id }), values });
     },
     onSuccess: () => {
       void qc.invalidateQueries({ queryKey: [table] });
-      toast.success("Salvo na nuvem");
+      toast.success("Salvo");
     },
     onError: (e) => toast.error(friendlyError(e)),
   });
@@ -106,8 +83,7 @@ export function useDeleteRow(table: TableName) {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from(table).delete().eq("id", id);
-      if (error) throw error;
+      await request("DELETE", table, { id });
     },
     onSuccess: () => {
       // Deleting a student detaches its history, so refresh everything.
@@ -116,6 +92,12 @@ export function useDeleteRow(table: TableName) {
     },
     onError: (e) => toast.error(friendlyError(e)),
   });
+}
+
+export async function importRows(rows: ImportRows) {
+  for (const table of ["students", "lessons", "assessments", "transactions"] as const) {
+    for (const values of rows[table]) await request("POST", table, { values });
+  }
 }
 
 export function studentNameMap(students: Student[]): Map<string, string> {

@@ -7,8 +7,7 @@ import { useIsFetching, useIsMutating } from "@tanstack/react-query";
 import {
   BarChart3,
   CalendarCheck,
-  Cloud,
-  CloudUpload,
+  Database,
   HeartPulse,
   Home,
   Plus,
@@ -53,8 +52,8 @@ function SyncBadge({ className }: { className?: string }) {
         className,
       )}
     >
-      {busy ? <CloudUpload className="size-3.5 animate-pulse" /> : <Cloud className="size-3.5" />}
-      {busy ? "Salvando…" : fetching > 0 ? "Atualizando…" : "Sincronizado"}
+      <Database className={cn("size-3.5", busy && "animate-pulse")} />
+      {busy ? "Salvando…" : fetching > 0 ? "Atualizando…" : "Salvo no servidor"}
     </span>
   );
 }

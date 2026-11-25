@@ -131,7 +131,7 @@ function Dashboard() {
   const overdue = lessons.filter((l) => l.status === "agendada" && l.lesson_date < now).length;
   const recent = lessons.filter((l) => l.status !== "agendada").slice(0, 6);
 
-  const firstName = String(user.user_metadata?.["full_name"] ?? "").split(" ")[0];
+  const firstName = user.name.split(" ")[0];
   const hello =
     new Date().getHours() < 12 ? "Bom dia" : new Date().getHours() < 18 ? "Boa tarde" : "Boa noite";
 

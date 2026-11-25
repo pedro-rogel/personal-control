@@ -1,9 +1,9 @@
 /**
- * Converts backups to rows for the cloud database.
+ * Converts backups to rows for the application database.
  * Supports the original Personal Control v1 file (localStorage export:
  * { students, classes, assessments, payments }) and this app's own export (version 2).
  */
-import type { TablesInsert } from "@/integrations/supabase/types";
+import type { TablesInsert } from "@/lib/models";
 
 type Obj = Record<string, unknown>;
 
@@ -141,9 +141,9 @@ export function parseBackup(
 
 const STRIP = ["owner_id", "created_at", "updated_at"];
 export function toExport(
-  data: Record<"students" | "lessons" | "assessments" | "transactions", Obj[]>,
+  data: Record<"students" | "lessons" | "assessments" | "transactions", object[]>,
 ) {
-  const clean = (rows: Obj[]) =>
+  const clean = (rows: object[]) =>
     rows.map((r) => Object.fromEntries(Object.entries(r).filter(([k]) => !STRIP.includes(k))));
   return {
     version: 2,

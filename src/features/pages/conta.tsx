@@ -7,10 +7,12 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Download, Loader2, LogOut, Share, ShieldCheck, SquarePlus, Upload } from "lucide-react";
 import { toast } from "sonner";
 
-import { supabase } from "@/lib/supabase-client";
+import { authClient } from "@/lib/auth-client";
+import { Link } from "@/components/app-link";
 import {
   allQueryKeys,
   assessmentsQuery,
+  importRows,
   lessonsQuery,
   studentsQuery,
   transactionsQuery,
@@ -69,17 +71,7 @@ function AccountPage() {
         toast.message("O arquivo não tem registros para importar.");
         return;
       }
-      const steps = [
-        ["students", rows.students],
-        ["lessons", rows.lessons],
-        ["assessments", rows.assessments],
-        ["transactions", rows.transactions],
-      ] as const;
-      for (const [table, data] of steps) {
-        if (!data.length) continue;
-        const { error } = await supabase.from(table).insert(data as never);
-        if (error) throw error;
-      }
+      await importRows(rows);
       await Promise.all(allQueryKeys.map((queryKey) => qc.invalidateQueries({ queryKey })));
       toast.success(
         `Importado: ${rows.students.length} aluno(s), ${rows.lessons.length} aula(s), ${rows.assessments.length} avaliação(ões), ${rows.transactions.length} lançamento(s).`,
@@ -93,7 +85,7 @@ function AccountPage() {
   }
 
   async function signOut() {
-    await supabase.auth.signOut();
+    await authClient.signOut();
     qc.clear();
     void navigate({ to: "/auth", replace: true });
   }
@@ -107,7 +99,7 @@ function AccountPage() {
         <div className="flex items-start gap-3 rounded-xl bg-success-soft p-3 text-sm text-success">
           <ShieldCheck className="mt-0.5 size-5 shrink-0" />
           <p>
-            Tudo é salvo automaticamente na nuvem a cada alteração e só pode ser acessado pela sua
+            Tudo é salvo automaticamente no banco local a cada alteração e só pode ser acessado pela sua
             conta. Seus alunos nunca ficam visíveis publicamente.
           </p>
         </div>
@@ -168,6 +160,10 @@ function AccountPage() {
           </li>
         </ol>
       </Card>
+
+      <Button asChild variant="secondary" className="w-full sm:w-auto">
+        <Link to="/reset-password">Alterar senha</Link>
+      </Button>
 
       <Button variant="danger" className="w-full sm:w-auto" onClick={() => void signOut()}>
         <LogOut /> Sair da conta

@@ -8,7 +8,7 @@ if (!url) throw new Error("DATABASE_URL não configurada");
 
 export default defineConfig({
   dialect: "postgresql",
-  schema: "./src/server/db/schema.ts",
+  schema: "./src/server/modules/**/schema.ts",
   out: "./drizzle/local-migrations",
   dbCredentials: { url },
 });

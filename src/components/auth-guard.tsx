@@ -1,12 +1,12 @@
 "use client";
 
-import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, type ReactNode } from "react";
 import { useRouter } from "next/navigation";
-import type { User } from "@supabase/supabase-js";
-import { supabase } from "@/lib/supabase-client";
+import { authClient } from "@/lib/auth-client";
 import { AppShell } from "@/components/app-shell";
 
-const UserContext = createContext<User | null>(null);
+type AuthUser = { id: string; email: string; name: string };
+const UserContext = createContext<AuthUser | null>(null);
 
 export function useAuthUser() {
   const user = useContext(UserContext);
@@ -16,33 +16,11 @@ export function useAuthUser() {
 
 export function AuthGuard({ children }: { children: ReactNode }) {
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
-  const [state, setState] = useState<"loading" | "ready" | "error">("loading");
+  const { data, isPending, error } = authClient.useSession();
   useEffect(() => {
-    let active = true;
-    const check = async () => {
-      try {
-        const { data, error } = await supabase.auth.getUser();
-        if (!active) return;
-        if (error && error.name !== "AuthSessionMissingError") { setState("error"); return; }
-        if (!data.user) { router.replace("/auth"); return; }
-        setUser(data.user);
-        setState("ready");
-      } catch {
-        if (active) setState("error");
-      }
-    };
-    void check();
-    const { data } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_OUT") { setUser(null); router.replace("/auth"); }
-      else if ((event === "SIGNED_IN" || event === "USER_UPDATED") && session?.user) {
-        setUser(session.user);
-        setState("ready");
-      }
-    });
-    return () => { active = false; data.subscription.unsubscribe(); };
-  }, [router]);
-  if (state === "error") return <div role="alert" className="p-6">Não foi possível verificar sua sessão. Recarregue a página.</div>;
-  if (state !== "ready" || !user) return <div className="p-6">Carregando…</div>;
-  return <UserContext.Provider value={user}><AppShell>{children}</AppShell></UserContext.Provider>;
+    if (!isPending && !error && !data?.user) router.replace("/auth");
+  }, [data?.user, error, isPending, router]);
+  if (error) return <div role="alert" className="p-6">Não foi possível verificar sua sessão. Recarregue a página.</div>;
+  if (isPending || !data?.user) return <div className="p-6">Carregando…</div>;
+  return <UserContext.Provider value={data.user}><AppShell>{children}</AppShell></UserContext.Provider>;
 }

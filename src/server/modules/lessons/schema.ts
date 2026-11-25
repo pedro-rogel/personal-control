@@ -28,7 +28,7 @@ export const lessions = pgTable(
       .default("realized"),
     perfomance: text("performance", { enum: ["good", "regular", "bad"] }),
     muscleGroups: text("muscle_groups").array().notNull().default([]),
-    value: numeric("value"),
+    value: numeric("value", { mode: "number" }),
     notes: text("notes"),
     createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
     updatedAt: timestamp("update_at", { withTimezone: true }).notNull().defaultNow(),
