@@ -2,7 +2,7 @@ import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { betterAuth } from "better-auth";
 import { randomUUID } from "node:crypto";
 
-import { db } from "@/server/db/client";
+import { db } from "@/server/db/connection";
 import * as authSchema from "@/server/modules/auth/schema";
 
 export const auth = betterAuth({
